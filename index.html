@@ -33,21 +33,6 @@
       .replace(/ \t|\t /g, "")
 
     document.addEventListener("DOMContentLoaded", async () => {
-      const speak = (lang, text) =>
-        new Promise((resolve, reject) => {
-          let u = new SpeechSynthesisUtterance(text);
-          u.lang = lang;
-          u.volume = 1
-
-          const voices = window.speechSynthesis.getVoices().filter(it => it.lang === lang && it.name.includes("Google"))
-          if (1 <= voices.length)
-            u.voice = voices[0];
-
-          u.onend = resolve;
-          u.onerror = reject;
-          window.speechSynthesis.speak(u);
-        });
-
       document.getElementById("resume").addEventListener("click", () => {
         window.speechSynthesis.resume();
       });
@@ -63,13 +48,34 @@
         });
       }
 
+      const speak = (lang, text) =>
+        new Promise((resolve, reject) => {
+          let u = new SpeechSynthesisUtterance(text);
+          u.lang = lang;
+          u.volume = 1
+
+          const voices = window.speechSynthesis.getVoices().filter(it => it.lang === lang);
+          for (const voicesFiltered of [
+            voices.filter(it => (it.name.includes("Google"))),
+            voices.filter(it => (it.voiceURI.includes("com.apple.voice."))),
+          ])
+            if (1 <= voicesFiltered.length) {
+              u.voice = voicesFiltered[0];
+              break;
+            }
+
+          u.onend = resolve;
+          u.onerror = reject;
+          window.speechSynthesis.speak(u);
+        });
+
       let i = parseInt(new URL(window.location.href).searchParams.get("i")) || 0;
 
       const dummy = async () => {
         const u = new SpeechSynthesisUtterance('');
         u.lang = "zh-TW"
         window.speechSynthesis.speak(u);
-        document.body.removeEventListener('click', dummy);
+        document.getElementById("resume").removeEventListener('click', dummy);
 
         while (true) {
           const url = new URL(window.location.href);
@@ -109,34 +115,29 @@
 
           window.speechSynthesis.cancel();
 
-          if (cmnChecked)
-            try {
-              await speak("zh-TW", w);
-            } catch (e) {
-              console.error(e);
-              await sleep(500);
-            }
+          if (cmnChecked) {
+            await speak("zh-TW", w);
+            await sleep(500);
+            await speak("zh-TW", w);
+            await sleep(500);
+          }
 
-          if (yueChecked)
-            try {
-              await speak("zh-HK", w);
-            } catch (e) {
-              console.error(e);
-              await sleep(500);
-            }
+          if (yueChecked) {
+            await speak("zh-HK", w);
+            await sleep(500);
+            await speak("zh-HK", w);
+            await sleep(500);
+          }
 
-          if (cmnChecked || yueChecked)
-            await sleep(100)
-          else
+          if (!cmnChecked && !yueChecked)
             await sleep(1000);
-
 
           i = document.getElementById("random").checked
             ? Math.floor(Math.random() * data.length)
             : (i + 1) % data.length;
         }
       }
-      document.body.addEventListener('click', dummy);
+      document.getElementById("resume").addEventListener('click', dummy);
     });
   </script>
 
@@ -202,7 +203,7 @@
     #prev-word,
     #curr-word,
     #next-word {
-      font-size: 600%;
+      font-size: 500%;
     }
 
     #prev-cmn,
