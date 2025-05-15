@@ -48,6 +48,12 @@
           window.speechSynthesis.speak(u);
         });
 
+      document.getElementById("resume").addEventListener("click", () => {
+        window.speechSynthesis.resume();
+      });
+      document.getElementById("pause").addEventListener("click", () => {
+        window.speechSynthesis.pause();
+      });
 
       document.querySelector("#index span").textContent = data.length
       for (const q of ["#index input", "input[type='range']",]) {
@@ -57,20 +63,11 @@
         });
       }
 
-      document.getElementById("toggle").addEventListener("click", () => {
-        console.log("toggle", window.speechSynthesis.speaking, window.speechSynthesis.paused)
-
-        if (window.speechSynthesis.speaking)
-          window.speechSynthesis.pause();
-        else if (window.speechSynthesis.paused)
-          window.speechSynthesis.resume();
-      });
-
       let i = parseInt(new URL(window.location.href).searchParams.get("i")) || 0;
 
       const dummy = async () => {
         const u = new SpeechSynthesisUtterance('');
-        u.lang = "en-BR"
+        u.lang = "zh-TW"
         window.speechSynthesis.speak(u);
         document.body.removeEventListener('click', dummy);
 
@@ -214,7 +211,7 @@
     #prev-yue,
     #curr-yue,
     #next-yue {
-      font-size: 300%;
+      font-size: xx-large;
     }
 
     [id^="prev-"],
@@ -251,7 +248,8 @@
         <input type="number" min="0" value="0"></input>/<span></span>
       </label>
 
-      <button id="toggle">⏯</button>
+      <button id="resume">⏵</button>
+      <button id="pause">⏸</button>
     </div>
   </nav>
 
