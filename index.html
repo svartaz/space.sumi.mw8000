@@ -14,13 +14,13 @@
     import data from "./8000mw.js";
     import { replaceEach } from "https://sumi.space/js/string.js";
     import { sleep } from "https://sumi.space/js/promise.js";
-    import { pinyinSyllableToObject, pinyinToSyllables } from "https://cdn.jsdelivr.net/gh/svartaz/space.sumi/js/cmn.js";
+    import { pinyinSyllableToObject, pinyinToSyllables } from "https://sumi.space/js/cmn.js";
     import { jyutpingSyllableToObject } from "https://sumi.space/js/yue.js";
 
     const pinyinToCmn = (pinyin) =>
       pinyin
         .replace(/[\p{sc=Latn}']+/ug, latn => pinyinToSyllables(latn)
-          .map(it => pinyinSyllableToObject(it).string)
+          .map(it => pinyinSyllableToObject(it).text)
           .join(" ")
         )
 
@@ -71,11 +71,11 @@
 
       let i = parseInt(new URL(window.location.href).searchParams.get("i")) || 0;
 
-      const dummy = async () => {
+      const begin = async () => {
         const u = new SpeechSynthesisUtterance('');
         u.lang = "zh-TW"
         window.speechSynthesis.speak(u);
-        document.getElementById("resume").removeEventListener('click', dummy);
+        document.getElementById("resume").removeEventListener('click', begin);
 
         while (true) {
           const url = new URL(window.location.href);
@@ -97,18 +97,18 @@
           document.getElementById("curr-category").textContent = curr[2];
           document.getElementById("next-category").textContent = next[2];
 
-          document.getElementById("prev-word").textContent = prev[3].replace(/\([˙\p{sc=Bopomofo}+]+\)/ug, "");
-          document.getElementById("curr-word").textContent = curr[3].replace(/\([˙\p{sc=Bopomofo}+]+\)/ug, "");
-          document.getElementById("next-word").textContent = next[3].replace(/\([˙\p{sc=Bopomofo}+]+\)/ug, "");
+          document.getElementById("prev-word").textContent = prev[3].replace(/\([˙ˋ\p{sc=Bopomofo}]+\)/ug, "");
+          document.getElementById("curr-word").textContent = curr[3].replace(/\([˙ˋ\p{sc=Bopomofo}]+\)/ug, "");
+          document.getElementById("next-word").textContent = next[3].replace(/\([˙ˋ\p{sc=Bopomofo}]+\)/ug, "");
 
           document.getElementById("prev-cmn").textContent = pinyinToCmn(prev[4]);
           document.getElementById("curr-cmn").textContent = pinyinToCmn(curr[4]);
           document.getElementById("next-cmn").textContent = pinyinToCmn(next[4]);
 
-          const w = curr[3].replace(/\(˙[^\)]+\)/g, "");
-          document.getElementById("prev-yue").textContent = textToYue(prev[3].replace(/\([˙\p{sc=Bopomofo}+]+\)/ug, ""));
-          document.getElementById("curr-yue").textContent = textToYue(curr[3].replace(/\([˙\p{sc=Bopomofo}+]+\)/ug, ""));
-          document.getElementById("next-yue").textContent = textToYue(next[3].replace(/\([˙\p{sc=Bopomofo}+]+\)/ug, ""));
+          const w = curr[3].replace(/\([˙ˋ\p{sc=Bopomofo}]+\)/ug, "");
+          document.getElementById("prev-yue").textContent = textToYue(prev[3].replace(/\([˙ˋ\p{sc=Bopomofo}]+\)/ug, ""));
+          document.getElementById("curr-yue").textContent = textToYue(curr[3].replace(/\([˙ˋ\p{sc=Bopomofo}]+\)/ug, ""));
+          document.getElementById("next-yue").textContent = textToYue(next[3].replace(/\([˙ˋ\p{sc=Bopomofo}]+\)/ug, ""));
 
           const cmnChecked = document.getElementById("cmn").checked;
           const yueChecked = document.getElementById("yue").checked;
@@ -137,7 +137,7 @@
             : (i + 1) % data.length;
         }
       }
-      document.getElementById("resume").addEventListener('click', dummy);
+      document.getElementById("resume").addEventListener('click', begin);
     });
   </script>
 
